@@ -1,0 +1,42 @@
+app/ is where all the pages go from now on
+
+app/api is where all the api calls go from now on. app/api isn't bundled together under the hood. each is going to be their own serverless function. it doesn't know about react
+
+AWS, and next.js serverless functions are heavily based on Express.js (node.js framework)
+
+to create another page:
+app/about/page.tsx
+app/users/[id]/page.tsx
+
+app/page.tsx is the home page. there can only be one page.tsx per folder as each folder is a route
+
+app/(anything)/home/page.tsx here (anything) is a folder that can have multiple pages, but (anything) will be ignored (domain/home/page.tsx will work)
+
+
+
+NAVIGATION (next.js does so much here):
+-router resuses shared layouts if they haven't changed from client-side cache
+-if nothing changed, it doesn't fetch from server but from cache
+-if something changed, it fetches the Server Component payload from the server
+-if page is created (not cached), loading UI is shown while payload is fetched from server
+
+SERVER VS CLIENT COMPONENTS:
+-before next.js 13 you had getServerSideProps and getStaticProps (server-side rendering)
+  -that way you could import fs from 'fs' and read files with those functions
+  -next.js was splitting imports for you, so they were not bundled together (browser doesn't know about fs)
+-now you don't have getServerSideProps anymore
+ -the page.tsx as Server Components. Not rendering on the client at all. No JavaScript / no interactivity. Just HTML
+ -with SSR we built in the server but then the client would still pick up and match it (hydration) meaning you send all the JS serialized (turned into json) then unserialized on the client so the JS code would still run. Now it doesn't
+ -to make it a Client Component, write 'use client' at the top of the page.tsx. For instance, to use useRouter (window.location under the hood)
+ -Server Components are a React 18 feature, not a Next.js feature
+ -Next.js still has Rendering Modes (SSR, SSG, ISR) but now it also has Component Modes (Server, Client)
+ -Server Components do STREAMING instead of sending serializable code. Instead of waiting for the fetching to finish and then sending everything as with SSR Client Components, the fetching is being STREAMED to the client. So you're gonna see more things with parts loading before others
+
+
+ -Now we push the client components far down the tree (call them leaf components) and the rest remain server components
+ -Because the Server Components never leave the server (as components), they don't have access to browser APIs (window, document, etc) that means no event loop, no state, no hooks. No component lifecycle.
+ -React and Chrome worked together to send less JS to the browser
+
+
+ 
+
